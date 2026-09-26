@@ -73,7 +73,7 @@ func (provider) Invoke(ctx context.Context, req *pb.InvokeRequest) (*pb.InvokeRe
 			return nil, fmt.Errorf("examplerequire: decode input: %w", err)
 		}
 	}
-	out := map[string]json.RawMessage{}
+	out := map[string]any{"status": "pass", "message": in.Marker}
 	// A declared verb peer is invoked with its own plugin_input; the reference peers read
 	// a `marker` (externalprobe) or an optional peer command (exampledispatchpeer, whose
 	// absent value is the plain peer-reached echo).
@@ -86,11 +86,7 @@ func (provider) Invoke(ctx context.Context, req *pb.InvokeRequest) (*pb.InvokeRe
 		if ierr != nil {
 			return nil, fmt.Errorf("examplerequire: invoke declared peer %q: %w", word, ierr)
 		}
-		out[label] = pres
-	}
-	out["marker"], err = json.Marshal(in.Marker)
-	if err != nil {
-		return nil, err
+		out[label] = json.RawMessage(pres)
 	}
 	res, err := json.Marshal(out)
 	if err != nil {
