@@ -31,8 +31,11 @@ plugin-example-require:
                   source: github.com/opencharly/plugin-example-dispatch/candy/plugin-example-dispatch
             source: github.com/opencharly/plugin-example-require/candy/plugin-example-require
         plan:
-            - check: the out-of-tree requires-witness plugin ships a buildable Go module (go.mod + the provider main) the host can build + serve out-of-process; the full declare -> gate-resolve -> peer-invoke end-to-end is exercised by the disposable check-plugin-requires-local bed
-              id: examplerequire-module-present
+            - check: the examplerequire verb dispatches and PEER-INVOKES both declared peers (verb:externalprobe, compiled in; verb:exampledispatchpeer, out-of-process) over the host broker, proving the require-path reaches both placements at runtime
+              id: examplerequire-dispatches
+              examplerequire:
+                marker: plugin-example-require-ok
+                builtin_peer: externalprobe
+                external_peer: exampledispatchpeer
               context:
-                - build
-              command: "true"
+                - runtime
