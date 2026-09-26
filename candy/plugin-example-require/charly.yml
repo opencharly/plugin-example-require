@@ -1,0 +1,38 @@
+version: 2026.232.0520
+plugin-example-require:
+    candy:
+        version: 2026.269.0001
+        description: |-
+            Reference OUT-OF-TREE charly plugin for the DECLARED inter-plugin
+            dependency mechanism. Its `plugin.requires:` list declares TWO peers —
+            `verb:externalprobe` (served by candy/plugin-example-external, compiled
+            into charly) and `verb:exampledispatchpeer` (served out-of-process by
+            candy/plugin-example-dispatch) — and its `examplerequire` verb
+            peer-invokes both over the host broker (sdk.Executor.InvokeProvider),
+            echoing their results. The AUTHORED MANIFEST is the ONE source of the
+            declaration: the host reads it from the resolved view and resolves every
+            requirement before this plugin's providers register, so a plugin's
+            internal peer need no longer be referenced by the project's own plans.
+            There is deliberately NO sdk.NewMetaWithRequires call in this plugin's Go
+            — the manifest is the declaration (no manifest/Go duplication), and
+            adding another plugin that declares its peers needs ZERO charly-core
+            change. The live witness is the disposable check-plugin-requires-local
+            bed.
+        plugin:
+            providers:
+                - verb:examplerequire
+            requires:
+                # A compiled-in peer: the gate finds it already registered (the
+                # resolve branch). No source needed.
+                - capability: verb:externalprobe
+                # An out-of-process peer: the gate connects it on demand from its
+                # declared source (the connect branch) — no plan references it.
+                - capability: verb:exampledispatchpeer
+                  source: github.com/opencharly/plugin-example-dispatch/candy/plugin-example-dispatch
+            source: github.com/opencharly/plugin-example-require/candy/plugin-example-require
+        plan:
+            - check: the out-of-tree requires-witness plugin ships a buildable Go module (go.mod + the provider main) the host can build + serve out-of-process; the full declare -> gate-resolve -> peer-invoke end-to-end is exercised by the disposable check-plugin-requires-local bed
+              id: examplerequire-module-present
+              context:
+                - build
+              command: "true"
