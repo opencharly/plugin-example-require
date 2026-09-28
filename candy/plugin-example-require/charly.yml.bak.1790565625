@@ -1,5 +1,7 @@
+version: 2026.232.0520
 plugin-example-require:
     candy:
+        version: 2026.269.0001
         description: |-
             Reference OUT-OF-TREE charly plugin for the DECLARED inter-plugin
             dependency mechanism. Its `plugin.requires:` list declares TWO peers —
